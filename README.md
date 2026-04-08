@@ -9,7 +9,7 @@ The labs are designed to reinforce concepts from **CCNA-level networking**, whil
 
 ## 🎯 Objectives
 
-* Strengthen core networking fundamentals (VLANs, routing, switching, services)
+* Strengthen core networking fundamentals (VLANs, routing, switching, security, wireless services)
 * Build practical, hands-on lab experience
 * Develop network automation skills using Python
 * Simulate real-world enterprise network scenarios

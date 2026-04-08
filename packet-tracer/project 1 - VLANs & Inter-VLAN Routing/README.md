@@ -151,7 +151,6 @@ Linkedin: *[Hillary](https://www.linkedin.com/in/hillary-mapondera-7825b91a1/)*
 vlan-intervlan-routing/
     ├── Network-topology.png
     ├── project description.md
-    ├── vlans & Intervlan routing.pkt   
-    |   
+    ├── vlans & Intervlan routing.pkt     
     └── README.md  
 ```
