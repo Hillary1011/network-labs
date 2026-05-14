@@ -9,8 +9,8 @@ Simulate a medium sized organization network with multiple branches using dynami
 * OSPF single area (Area 0)
 * STP (PVST+)
 * Dynamic IP addressing (DHCP)
-* NAT
-* 
+* ACL
+* IP
 
 **Tools:**
 
@@ -33,13 +33,15 @@ A medium sized organization network with three sites using site-to-site direct l
    - Configure console port security on network devices (login local)
    - Configure enable secret protection
 2. **STP**
-   - Enabled (Papid-PVST+) on swtches
+   - Enable (Papid-PVST+) on switches
    - Set MSW1 as Root Bridge
 3. **VLAN configuration**
    - Assign appropriate VLANs for Adminstation and Department end devices
    - Configure appropriate trunk ports on L2 and L3 swicthes excluding L2SW3
 4. **Dynamic IP addressing (DHCP)**
-   - On MSW1 and MSW3 
+   - Set a static IP address on the server as `192.168.3.130`(This becomes the DNS server IP on all branches). 
+   - Manually setup the default gateway on server as `192.168.3.129`
+   - On MSW1 and MSW3   
      - Configure IP routing on MSW1 and DHCP server.
      - Configure SVIs for each VLAN (SVI becomes Gateway for the subnet).
      - Configure DHCP Server on MSW1 and MSW3 
@@ -52,15 +54,13 @@ A medium sized organization network with three sites using site-to-site direct l
    - Configure OSPF area 0 on all L3 devices 
    - Configure passive interfaces where necessary (SVIs, Loopbacks, interfaces towards endhosts) 
    - Set R3 to have a default route to ISP.
-7. **Internet access restriction on Department (ACL)** 
-   - [Continue here Ensure DHCP is such that Organizations server is the DNS, this requires to manually set its IP address and reserve its IP address in its local subnet pool, as well re configuring DNS on all subnets to use the server.]
-   - 
-8. **NAT**
-9.  Configure HSRP on both switches (SW2 active & pre-emptive)
-10. Configure Layer 3 etherchannel (LACP)
-11. Assign IP addresses to all network devices (Etherchannel inclusive)
-12. Configure static routes on SW (R1 as default route) and router
-13. Configure default route to ISP on R1 
+
+7. **DNS**
+   - Configure DNS AAA records on the server, Google `203.0.113.200`, Youtube `203.0.113.201`. 
+  
+8. **Internet access restriction on non-admin hosts (ACL)** 
+   - Configure extended ACLs on appropriate devices (MSw1, R2, MSW2).
+ 
 
 ## Verification
 
@@ -70,116 +70,70 @@ A medium sized organization network with three sites using site-to-site direct l
 2. Config processes step 5 `Configure Static IP address on routers and L3 Switches`
    - ✅ Confirm network devices on point-to-point links can ping each other
 3. Config processes step 6 `Dynamic routing (OSPF)` 
-   - Confirm IP address learning
-   - Confirm endhosts can reach 1.1.1.1 (ISP)
-4. 
+   - ✅ Confirm IP address learning
+   - ✅ Confirm endhosts can reach 1.1.1.1 (ISP)
+4. Config processes step 7 `DNS` 
+   - ✅ Verify endhosts (Admin PCs, Department PCs) can ping google.com
+   ![Verification-ACL](ACL-verification.png)
+5. Config processes step 8 `ACL configuration`
+   - ✅ Verify Admin PCs reach google.com
+   - ✅ Verify Department PCs cannot reach google.com
 
-
-## IP Addressing Scheme
-
-| Device | Interface | IP Address   | Subnet Mask     | Notes   |
-| ------ | --------- | ------------ | --------------- | ------- |
-| ISP    |  G0/0/0   | 10.0.0.1     | 255.255.255.252 |         |
-| ISP    |  L0       | 8.8.8.8      | 255.255.255.255 |         |
-| R1     |  L0       | 1.1.1.1      | 255.255.255.255 |         |
-| R1     |  G0/0/2   | 10.0.0.2     | 255.255.255.252 |         |
-| R1     |  G0/0/1   |192.168.200.10| 255.255.255.224 |         |
-| R1     |  G0/0/0   | 192.168.200.2| 255.255.255.252 |         |
-| MSw1   |  L0       | 2.2.2.2      | 255.255.255.255 |         |
-| MSw1   |  G1/7     | 192.168.200.1| 255.255.255.252 |         |
-| MSw1   |  Po1      | 192.168.200.5| 255.255.255.252 |         |
-| MSw1   |  vlan 1   | 192.168.1.253| 255.255.255.0   |         |
-| MSw2   |  L0       | 3.3.3.3      | 255.255.255.255 |         |
-| MSw2   |  G1/7     | 192.168.200.9| 255.255.255.252 |         |
-| MSw2   |  Po1      | 192.168.200.6| 255.255.255.252 |         |
-| MSw2   |  vlan 1   | 192.168.1.254| 255.255.255.0   |         |
-| PC0    |  Fa0      | 192.168.1.1  | 255.255.255.224 |         |
-| PC1    |  Fa0      | 192.168.1.2  | 255.255.255.224 |         |
-| PC2    |  Fa0      | 192.168.1.3  | 255.255.255.224 |         |
-| PC3    |  Fa0      | 192.168.1.4  | 255.255.255.224 |         |
-| PC4    |  Fa0      | 192.168.1.5  | 255.255.255.224 |         |
-| PC5    |  Fa0      | 192.168.1.6  | 255.255.255.224 |         |
-| PC6    |  Fa0      | 192.168.1.7  | 255.255.255.224 |         |
-| PC7    |  Fa0      | 192.168.1.8  | 255.255.255.224 |         |
-| PC8    |  Fa0      | 192.168.1.9  | 255.255.255.224 |         |
-
----
-
-## Configurations
-
-### Router Configurations
-1. Password protection (console, enable secret)
-   - Console login local 
-     - username: cisco
-     - secret: ccna
-   - Enable secret: ccna
-2. Route configurations
-
-```
-ip route 0.0.0.0 0.0.0.0 GigabitEthernet0/0/2 
----Added in troubleshooting phase---
-ip route 192.168.1.0 255.255.255.0 192.168.200.1 4
-ip route 192.168.1.0 255.255.255.0 192.168.200.9
-```
-
-
-### Switch Configurations
-1. Password protection (console, enable secret)
-   - Console login local 
-     - username: cisco
-     - secret: ccna
-   - Enable secret: ccna
-
-2. VLAN 1 IP address (MSw1 & MSw2)
-3. HSRP (MSw1 & MSw2)
-4. ROute configurayions
-```
-ip route 0.0.0.0 0.0.0.0 GigabitEthernet1/7
-```
-
----
-
-## Config processes
-1. Assign endhost static IP addresses
-2. Configure appropriate names for network devices
-3. Enable password protection on network devices
-4. Enabled (PVST+) on swtches
-5. Set MSw2 as Root Bridge
-6. Assign Vlan 1 IP address on L3 SW
-7. Configure HSRP on both switches (SW2 active & pre-emptive)
-8. Configure Layer 3 etherchannel (LACP)
-9. Assign IP addresses to all network devices (Etherchannel inclusive)
-10. Configure static routes on SW (R1 as default route) and router
-11. Configure default route to ISP on R1 
-
-
-
-
-
-
-**Expected Results:**
-All PCs must be able to ping each other, reach ISP (8.8.8.8)
 
 ---
 
 ## Troubleshooting 
 
-| Issue                 | Cause         | Fix                  |
-| --------------------- | ------------- | -------------------- |
-| Endhosts could not reach ISP 8.8.8.8 | R1 had default route to ISP but no route back to host subnet 192.168.1.0 /24 | Configured route to 192.168.1.0 /24 MSw1 as next hop with AD of 4 and MSw1 as next hop AD 1. The floating static route to MSw1 will allow traffic to be routed to MSw1 in the event that MSw2 fails. HSRP handles this failure for endhosts|
+| Issue                 | Cause         | Fix                  |  Note     |
+| --------------------- | ------------- | -------------------- | ---------|
+| Config 8: Department PCs in site B could still reach internet after ACL configuration | R2's G0/0 interface was configured with subinterfaces with the intent of establishing router on a stick. When configuring the ACL the interface g0/0 was used using command `ip access-group {ACL-name} in`. *Assumption:* (The ACL could not capture the traffic in the sub-interfaces) | Applied the ACL on subinterface g0/0.10 which is in the same vlan as the department endhosts| A similar issue would occure on Site C MSW2 if command `ip access-group {ACL-name} in` is used on f0/2 since it is a trunkport and SVIs configured for each of the Vlans. The solution is to apply the ACL on F0/1 as `output`|
+
+**Issue config 8:**
+![Verification](ACL-R2-Troubleshoot.png)
+**Fix config 8:**
+![Verification](ACL-R2-Fix.png)
 
 ---
+
+## IP Addressing Scheme
+
+| Device | Interface | IP Address   | Subnet Mask     | Notes   |
+| ------ | --------- | ------------ | --------------- | ------- |
+| R1     |  G0/0     |192.168.1.254 | 255.255.255.252 |         |
+| R1     |  S0/3/0   | 192.168.254.9| 255.255.255.252 |         |
+| R1     |  S0/3/1   | 192.168.254.6| 255.255.255.252 |         |
+| R2     |  G0/0.5   | 192.168.2.129| 255.255.255.248 |         |
+| R2     |  G0/0.10  | 192.168.2.1  | 255.255.255.248 |         |
+| R2     |  S0/3/0   | 192.168.254.1| 255.255.255.252 |         |
+| R2     |  S0/3/0   | 192.168.254.5| 255.255.255.252 |         |
+| R3     |  G0/0     | 192.168.3.254| 255.255.255.252 |         |
+| R3     |  G0/2     | 203.0.113.2  | 255.255.255.252 |         |
+| R3     |  S0/3/0   | 192.168.254.2| 255.255.255.252 |         |
+| R3     |  S0/3/1   |192.168.254.10| 255.255.255.252 |         |
+| MSw1   |  F0/3     | 192.168.1.253| 255.255.255.252 |         |
+| MSw1   |  VLAN 5   | 192.168.1.129| 255.255.255.248 |         |
+| MSw1   |  Vlan 10  | 192.168.1.1  | 255.255.255.128 |         |
+| MSw2   |  F0/1     | 192.168.3.253| 255.255.255.252 |         |
+| MSW2   |  VLAN 5   | 192.168.3.129| 255.255.255.248 |         |
+| MSW2   |  VLAN 10  | 192.168.3.1  | 255.255.255.128 |         |
+| Server |  Fa0      | 192.168.3.130| 255.255.255.248 |         |
+| Admin  |  Fa0      | DHCP         | 255.255.255.248 |         |
+| Depart |  Fa0      | DHCP         | 255.255.255.128 |         |
+
 
 ## Key Learning Outcomes
 
-* Layer 3 Etherchannel configurations
+* Vlan Configurations
 * STP (PVST+)
-* HSRP
+* Dynamic IP address assignment
 * Static IP addressing
-* Static Routes
+* Dynamic routing
+* Use of ACL to control network access
+* Sub-interface based configuration of ACLs on interfaces forming router on a stick
+  
 ---
 
-## Files Included
+## Main Files
 
 | File            | Description           |
 | --------------- | --------------------- |
@@ -203,11 +157,16 @@ Linkedin: *[Hillary](https://www.linkedin.com/in/hillary-mapondera-7825b91a1/)*
 ## License
 
 
+**Project file structure**
+
 ```
-vlan-intervlan-routing/
-  ├── Network-topology.png
+Multi-Site Network with OSPF/
+  ├── Mutisite network with OSPF.pkt 
+  ├── Mutisite network with OSPF - No configurations.pkt
   ├── project description.md
-  ├── vlans & Intervlan routing.pkt
-  ├── vlans & Intervlan routing - No configurations.pkt      
-  └── README.md  
+  ├── README.md  
+  ├── Network-topology.png  
+  ├── ACL-verification.png
+  ├── ACL-R2-Troubleshoot.png   
+  └── ACL-R2-Fix.png
 ```
