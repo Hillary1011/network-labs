@@ -1,0 +1,195 @@
+Building configuration...
+
+Current configuration : 2946 bytes
+!
+version 12.2(37)SE1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname DSW5
+!
+!
+no profinet
+enable password ccna
+!
+!
+ip dhcp excluded-address 10.1.30.1
+ip dhcp excluded-address 10.1.1.1 10.1.1.5
+!
+ip dhcp pool POOL1
+ network 10.1.30.0 255.255.255.0
+ default-router 10.1.30.1
+ dns-server 203.0.113.3
+ip dhcp pool POOL2
+ network 10.1.20.0 255.255.255.0
+ default-router 10.1.20.1
+ dns-server 203.0.113.3
+ip dhcp pool WiFi_Management
+ network 10.1.1.0 255.255.255.0
+ default-router 10.1.1.1
+ option 43 ip 10.1.1.2
+ dns-server 203.0.113.3
+ domain-name show
+!
+!
+ip routing
+!
+!
+!
+!
+username hillary password 0 ccna
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+ip domain-name ruby.com
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface Loopback0
+ ip address 10.3.3.4 255.255.255.255
+!
+interface FastEthernet0/1
+ switchport trunk allowed vlan 20,30
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/2
+!
+interface FastEthernet0/3
+ no switchport
+ ip address 10.1.0.2 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/4
+ no switchport
+ no ip address
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/5
+ switchport access vlan 20
+ switchport mode access
+!
+interface FastEthernet0/6
+ switchport access vlan 30
+ switchport mode access
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+ switchport access vlan 11
+ switchport mode access
+!
+interface GigabitEthernet0/2
+ switchport access vlan 11
+ switchport mode access
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan11
+ mac-address 0006.2aa7.6101
+ ip address 10.1.1.1 255.255.255.0
+!
+interface Vlan12
+ mac-address 0006.2aa7.6102
+ ip address 192.168.100.1 255.255.255.0
+!
+interface Vlan20
+ mac-address 0006.2aa7.6103
+ ip address 10.1.20.1 255.255.255.0
+!
+interface Vlan30
+ mac-address 0006.2aa7.6104
+ ip address 10.1.30.1 255.255.255.0
+!
+router ospf 1
+ log-adjacency-changes
+ passive-interface Loopback0
+ passive-interface Vlan11
+ passive-interface Vlan20
+ passive-interface Vlan30
+ network 10.1.0.0 0.0.255.255 area 0
+ network 10.3.3.4 0.0.0.0 area 0
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.0.0.1 
+ip route 0.0.0.0 0.0.0.0 10.1.254.0 
+ip route 0.0.0.0 0.0.0.0 10.1.0.1 
+!
+ip flow-export version 9
+!
+!
+access-list 1 permit host 192.168.254.1
+!
+!
+!
+!
+!
+!
+line con 0
+!
+line aux 0
+!
+line vty 0
+ access-class 1 in
+ login local
+ transport input ssh
+line vty 1 4
+ login
+!
+!
+!
+!
+end

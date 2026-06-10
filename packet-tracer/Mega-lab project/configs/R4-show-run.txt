@@ -1,0 +1,118 @@
+Building configuration...
+
+Current configuration : 1544 bytes
+!
+version 15.4
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+no service password-encryption
+!
+hostname Router
+!
+!
+!
+!
+ip dhcp excluded-address 192.168.254.250 192.168.254.254
+!
+ip dhcp pool HomeIPs
+ network 192.168.254.0 255.255.255.0
+ default-router 192.168.254.254
+ dns-server 8.8.8.8
+!
+!
+!
+ip cef
+no ipv6 cef
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface Tunnel0
+ ip address 192.168.5.13 255.255.255.252
+ mtu 1476
+ tunnel source GigabitEthernet0/0/0
+ tunnel destination 203.0.113.33
+!
+!
+interface Tunnel1
+ ip address 192.168.5.17 255.255.255.252
+ mtu 1476
+ tunnel source GigabitEthernet0/0/0
+ tunnel destination 203.0.113.46
+!
+!
+interface Tunnel2
+ ip address 192.168.5.22 255.255.255.252
+ mtu 1476
+ tunnel source GigabitEthernet0/0/0
+ tunnel destination 203.0.113.58
+!
+!
+interface GigabitEthernet0/0/0
+ ip address 203.0.113.37 255.255.255.252
+ ip nat outside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0/1
+ ip address 192.168.254.254 255.255.255.0
+ ip nat inside
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/0/2
+ no ip address
+ duplex auto
+ speed auto
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router eigrp 1
+ network 203.0.113.36 0.0.0.3
+!
+router ospf 1
+ log-adjacency-changes
+ network 192.168.0.0 0.0.255.255 area 0
+!
+ip nat inside source list 1 interface GigabitEthernet0/0/0 overload
+ip classless
+!
+ip flow-export version 9
+!
+!
+access-list 1 permit 192.168.254.0 0.0.0.255
+!
+!
+!
+!
+!
+line con 0
+!
+line aux 0
+!
+line vty 0 4
+ login
+!
+!
+!
+end

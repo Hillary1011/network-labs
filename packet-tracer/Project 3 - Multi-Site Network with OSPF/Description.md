@@ -23,12 +23,11 @@ Simulate a company with multiple branches using dynamic routing protocol.
 ✅ Validation
 - OSPF neighbor adjacency
 - Dynamic route propagation
-- Failover testing
 - PCs obtain IP automatically
 - DNS name resolution
-- Internet access simulation via NAT
+- Internet access restriction
+- 
 
 📦 Deliverables
 - .pkt file
 - Routing table screenshots
-- OSPF explanation
